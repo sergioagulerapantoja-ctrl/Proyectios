@@ -1,0 +1,5 @@
+<svg width="246" height="72" viewBox="0 0 246 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="246" height="72" rx="18" fill="#DCC6A5"/>
+  <path d="M35 27.5C35 22.806 38.806 19 43.5 19C48.194 19 52 22.806 52 27.5C52 31.005 49.879 34.016 46.85 35.317V39.2L64 49H23L40.15 39.2" stroke="#171512" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="78" y="45" fill="#171512" font-family="Georgia, serif" font-size="30" font-weight="600" letter-spacing="-.5">Ropalia</text>
+</svg>
