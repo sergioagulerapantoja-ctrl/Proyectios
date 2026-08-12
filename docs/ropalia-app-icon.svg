@@ -1,0 +1,19 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sand" x1="118" y1="72" x2="887" y2="948" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E9D8BE"/>
+      <stop offset="1" stop-color="#CFAE7F"/>
+    </linearGradient>
+    <filter id="shadow" x="82" y="75" width="860" height="875" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="28" stdDeviation="30" flood-color="#5C452C" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect x="38" y="38" width="948" height="948" rx="218" fill="url(#sand)"/>
+  <rect x="55" y="55" width="914" height="914" rx="201" stroke="#FFF9EF" stroke-opacity="0.4" stroke-width="8"/>
+  <g filter="url(#shadow)">
+    <path d="M446 281C446 244.549 475.549 215 512 215C548.451 215 578 244.549 578 281C578 306.57 563.452 328.746 542.171 339.711V371.3" stroke="#171512" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M541.7 371.3L684.2 461.3C695.484 468.426 690.437 485.9 677.09 485.9H346.91C333.563 485.9 328.516 468.426 339.8 461.3L482.3 371.3" stroke="#171512" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="512" y="684" text-anchor="middle" fill="#171512" font-family="Georgia, 'Times New Roman', serif" font-size="142" font-weight="600" letter-spacing="-5">Ropalia</text>
+  <path d="M383 726H641" stroke="#171512" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
+</svg>
