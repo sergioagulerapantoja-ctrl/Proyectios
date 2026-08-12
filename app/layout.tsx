@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(origin),
     title,
     description,
-    icons: { icon: "/ropalia-mark.svg", shortcut: "/ropalia-mark.svg" },
+    icons: { icon: "/ropalia-app-icon.svg", shortcut: "/ropalia-app-icon.svg", apple: "/ropalia-app-icon-512.png" },
     openGraph: { title, description, type: "website", locale: "es_BO", images: [{ url: `${origin}/og.png`, width: 1736, height: 907, alt: "Ropalia — Tu estilo, sin límites" }] },
     twitter: { card: "summary_large_image", title, description, images: [`${origin}/og.png`] },
   };

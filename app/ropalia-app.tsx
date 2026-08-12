@@ -47,6 +47,7 @@ const money = (value: number) => `Bs ${value.toLocaleString("es-BO")}`;
 
 export default function RopaliaApp() {
   const [view, setView] = useState<View>("inicio");
+  const [catalogOperation, setCatalogOperation] = useState<"Todas" | Operation>("Todas");
   const [selected, setSelected] = useState<Product>(products[0]);
   const [cart, setCart] = useState<Product[]>([products[2], products[1]]);
   const [favorites, setFavorites] = useState<number[]>([4]);
@@ -54,6 +55,10 @@ export default function RopaliaApp() {
   const [search, setSearch] = useState("");
 
   const navigate = (next: View) => { setView(next); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openCatalog = (operation: "Todas" | Operation = "Todas") => {
+    setCatalogOperation(operation);
+    navigate("catalogo");
+  };
   const openProduct = (product: Product) => { setSelected(product); navigate("detalle"); };
   const notify = (message: string) => { setToast(message); window.setTimeout(() => setToast(""), 2600); };
   const addCart = (product: Product) => {
@@ -66,10 +71,10 @@ export default function RopaliaApp() {
 
   return (
     <div className="app-shell">
-      <Header view={view} cartCount={cart.length} search={search} setSearch={setSearch} navigate={navigate} />
+      <Header view={view} catalogOperation={catalogOperation} cartCount={cart.length} search={search} setSearch={setSearch} navigate={navigate} openCatalog={openCatalog} />
       <main>
-        {view === "inicio" && <Home navigate={navigate} openProduct={openProduct} favorites={favorites} toggleFavorite={toggleFavorite} />}
-        {view === "catalogo" && <Catalog initialSearch={search} openProduct={openProduct} favorites={favorites} toggleFavorite={toggleFavorite} />}
+        {view === "inicio" && <Home navigate={navigate} openCatalog={openCatalog} openProduct={openProduct} favorites={favorites} toggleFavorite={toggleFavorite} />}
+        {view === "catalogo" && <Catalog key={catalogOperation} initialSearch={search} initialOperation={catalogOperation} openProduct={openProduct} favorites={favorites} toggleFavorite={toggleFavorite} />}
         {view === "detalle" && <ProductDetail product={selected} addCart={addCart} favorites={favorites} toggleFavorite={toggleFavorite} openProduct={openProduct} />}
         {view === "carrito" && <Cart items={cart} setCart={setCart} notify={notify} navigate={navigate} />}
         {view === "acceso" && <Auth navigate={navigate} notify={notify} />}
@@ -83,8 +88,8 @@ export default function RopaliaApp() {
   );
 }
 
-function Header({ view, cartCount, search, setSearch, navigate }: { view: View; cartCount: number; search: string; setSearch: (value: string) => void; navigate: (view: View) => void }) {
-  const submitSearch = (event: React.FormEvent) => { event.preventDefault(); navigate("catalogo"); };
+function Header({ view, catalogOperation, cartCount, search, setSearch, navigate, openCatalog }: { view: View; catalogOperation: "Todas" | Operation; cartCount: number; search: string; setSearch: (value: string) => void; navigate: (view: View) => void; openCatalog: (operation?: "Todas" | Operation) => void }) {
+  const submitSearch = (event: React.FormEvent) => { event.preventDefault(); openCatalog("Todas"); };
   return (
     <>
       <div className="top-note">Envíos a toda Bolivia · Alquila, disfruta y devuelve</div>
@@ -92,8 +97,8 @@ function Header({ view, cartCount, search, setSearch, navigate }: { view: View; 
         <button className="logo-button" onClick={() => navigate("inicio")} aria-label="Ir al inicio"><img src="/ropalia-logo.svg" alt="Ropalia" /></button>
         <nav className="main-nav" aria-label="Navegación principal">
           <button className={view === "inicio" ? "active" : ""} onClick={() => navigate("inicio")}>Inicio</button>
-          <button className={view === "catalogo" ? "active" : ""} onClick={() => navigate("catalogo")}>Comprar</button>
-          <button onClick={() => navigate("catalogo")}>Alquilar</button>
+          <button className={view === "catalogo" && catalogOperation === "Venta" ? "active" : ""} onClick={() => openCatalog("Venta")}>Comprar</button>
+          <button className={view === "catalogo" && catalogOperation === "Alquiler" ? "active" : ""} onClick={() => openCatalog("Alquiler")}>Alquilar</button>
           <button onClick={() => navigate("vendedor")}>Vender</button>
         </nav>
         <form className="header-search" onSubmit={submitSearch}>
@@ -106,13 +111,13 @@ function Header({ view, cartCount, search, setSearch, navigate }: { view: View; 
         </div>
       </header>
       <div className="mobile-nav">
-        <button onClick={() => navigate("inicio")}>Inicio</button><button onClick={() => navigate("catalogo")}>Explorar</button><button onClick={() => navigate("carrito")}>Carrito ({cartCount})</button><button onClick={() => navigate("acceso")}>Cuenta</button>
+        <button onClick={() => navigate("inicio")}>Inicio</button><button onClick={() => openCatalog("Venta")}>Comprar</button><button onClick={() => openCatalog("Alquiler")}>Alquilar</button><button onClick={() => navigate("carrito")}>Carrito ({cartCount})</button><button onClick={() => navigate("acceso")}>Cuenta</button>
       </div>
     </>
   );
 }
 
-function Home({ navigate, openProduct, favorites, toggleFavorite }: { navigate: (view: View) => void; openProduct: (product: Product) => void; favorites: number[]; toggleFavorite: (id: number) => void }) {
+function Home({ navigate, openCatalog, openProduct, favorites, toggleFavorite }: { navigate: (view: View) => void; openCatalog: (operation?: "Todas" | Operation) => void; openProduct: (product: Product) => void; favorites: number[]; toggleFavorite: (id: number) => void }) {
   return (
     <>
       <section className="hero section-pad">
@@ -120,7 +125,7 @@ function Home({ navigate, openProduct, favorites, toggleFavorite }: { navigate: 
           <span className="eyebrow">MODA CIRCULAR · BOLIVIA</span>
           <h1>Tu estilo,<br /><i>sin límites.</i></h1>
           <p>Compra piezas que amarás o alquila el look perfecto para ese momento especial. Moda más inteligente, cerca de ti.</p>
-          <div className="hero-actions"><button className="btn dark" onClick={() => navigate("catalogo")}>Explorar prendas <span>→</span></button><button className="btn text" onClick={() => navigate("vendedor")}>Publicar una prenda</button></div>
+          <div className="hero-actions"><button className="btn dark" onClick={() => openCatalog("Todas")}>Explorar prendas <span>→</span></button><button className="btn text" onClick={() => navigate("vendedor")}>Publicar una prenda</button></div>
           <div className="hero-trust"><span><b>2.500+</b> prendas</span><span><b>9 ciudades</b> conectadas</span><span><b>4.9/5</b> comunidad</span></div>
         </div>
         <div className="hero-visual">
@@ -133,16 +138,16 @@ function Home({ navigate, openProduct, favorites, toggleFavorite }: { navigate: 
       <section className="intro-strip"><span>COMPRA</span><i>✦</i><span>ALQUILA</span><i>✦</i><span>VENDE</span><i>✦</i><span>RENUEVA TU ESTILO</span></section>
 
       <section className="section-pad discover">
-        <div className="section-heading"><div><span className="eyebrow">ENCUENTRA TU LOOK</span><h2>Una prenda para<br /><i>cada momento</i></h2></div><button className="link-arrow" onClick={() => navigate("catalogo")}>Ver todo <span>→</span></button></div>
+        <div className="section-heading"><div><span className="eyebrow">ENCUENTRA TU LOOK</span><h2>Una prenda para<br /><i>cada momento</i></h2></div><button className="link-arrow" onClick={() => openCatalog("Todas")}>Ver todo <span>→</span></button></div>
         <div className="category-grid">
-          {categoryArt.map((item, index) => <button key={item.name} className={`category-card category-${index + 1}`} onClick={() => navigate("catalogo")}><img src={item.image} alt={item.name} /><span className="shade"></span><span className="category-copy"><small>{item.note}</small><b>{item.name}</b><em>→</em></span></button>)}
+          {categoryArt.map((item, index) => <button key={item.name} className={`category-card category-${index + 1}`} onClick={() => openCatalog(item.name === "En venta" ? "Venta" : item.name === "En alquiler" ? "Alquiler" : "Todas")}><img src={item.image} alt={item.name} /><span className="shade"></span><span className="category-copy"><small>{item.note}</small><b>{item.name}</b><em>→</em></span></button>)}
         </div>
       </section>
 
       <section className="featured-section section-pad">
         <div className="section-heading"><div><span className="eyebrow">SELECCIÓN ROPALIA</span><h2>Prendas que<br /><i>enamoran</i></h2></div><div className="tab-pills"><button className="selected">Destacados</button><button onClick={() => navigate("catalogo")}>Recién llegados</button><button onClick={() => navigate("catalogo")}>Más alquilados</button></div></div>
         <div className="product-grid">{products.filter((p) => p.featured).map((product) => <ProductCard key={product.id} product={product} openProduct={openProduct} favorite={favorites.includes(product.id)} toggleFavorite={toggleFavorite} />)}</div>
-        <button className="btn outline center-btn" onClick={() => navigate("catalogo")}>Ver catálogo completo <span>→</span></button>
+        <button className="btn outline center-btn" onClick={() => openCatalog("Todas")}>Ver catálogo completo <span>→</span></button>
       </section>
 
       <section className="city-section section-pad">
@@ -161,18 +166,51 @@ function ProductCard({ product, openProduct, favorite, toggleFavorite }: { produ
   return <article className="product-card"><div className="product-image"><img src={product.image} alt={product.name} /><span className={`operation-badge ${product.operation === "Alquiler" ? "rent" : "sale"}`}>{product.operation}</span><button className={`heart ${favorite ? "liked" : ""}`} onClick={() => toggleFavorite(product.id)} aria-label="Guardar en favoritos">{favorite ? "♥" : "♡"}</button><button className="quick-view" onClick={() => openProduct(product)}>Vista rápida</button></div><div className="product-info"><div className="product-meta"><span>{product.category} · {product.city}</span><span>★ {product.rating}</span></div><h3>{product.name}</h3><div className="price-line"><b>{money(product.price)} {product.operation === "Alquiler" && <small>/ día</small>}</b><span>Talla {product.size}</span></div></div></article>;
 }
 
-function Catalog({ initialSearch, openProduct, favorites, toggleFavorite }: { initialSearch: string; openProduct: (p: Product) => void; favorites: number[]; toggleFavorite: (id: number) => void }) {
+function Catalog({ initialSearch, initialOperation, openProduct, favorites, toggleFavorite }: { initialSearch: string; initialOperation: "Todas" | Operation; openProduct: (p: Product) => void; favorites: number[]; toggleFavorite: (id: number) => void }) {
   const [city, setCity] = useState("Todas");
-  const [operation, setOperation] = useState("Todas");
+  const [operation, setOperation] = useState<string>(initialOperation);
   const [style, setStyle] = useState("Todos");
   const [sort, setSort] = useState("Recomendados");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const clearFilters = () => { setCity("Todas"); setOperation("Todas"); setStyle("Todos"); };
   const filtered = useMemo(() => {
     let result = products.filter((p) => (!initialSearch || `${p.name} ${p.category}`.toLowerCase().includes(initialSearch.toLowerCase())) && (city === "Todas" || p.city === city) && (operation === "Todas" || p.operation === operation) && (style === "Todos" || p.style === style));
     if (sort === "Menor precio") result = [...result].sort((a, b) => a.price - b.price);
     if (sort === "Mayor precio") result = [...result].sort((a, b) => b.price - a.price);
     return result;
   }, [city, operation, style, sort, initialSearch]);
-  return <div className="catalog-page section-pad"><div className="catalog-head"><span className="eyebrow">CATÁLOGO ROPALIA</span><h1>Encuentra algo <i>muy tú</i></h1><p>{filtered.length} prendas seleccionadas para comprar o alquilar en Bolivia.</p></div><div className="catalog-toolbar"><button className="filter-toggle">☷ Filtros</button><span>{filtered.length} resultados</span><label>Ordenar por <select value={sort} onChange={(e) => setSort(e.target.value)}><option>Recomendados</option><option>Menor precio</option><option>Mayor precio</option></select></label></div><div className="catalog-layout"><aside className="filters"><div className="filter-title"><b>Filtros</b><button onClick={() => { setCity("Todas"); setOperation("Todas"); setStyle("Todos"); }}>Limpiar</button></div><FilterSelect label="Ciudad" value={city} setValue={setCity} options={["Todas", ...cities]} /><FilterSelect label="Operación" value={operation} setValue={setOperation} options={["Todas", "Venta", "Alquiler"]} /><FilterSelect label="Estilo" value={style} setValue={setStyle} options={["Todos", "Casual", "Formal"]} /><div className="filter-block"><b>Rango de precio</b><div className="price-inputs"><input placeholder="Bs 0" /><span>—</span><input placeholder="Bs 800" /></div></div><div className="filter-block"><b>Talla</b><div className="size-buttons">{["XS", "S", "M", "L", "XL"].map((s) => <button key={s}>{s}</button>)}</div></div><div className="filter-block"><b>Disponibilidad</b><label className="check"><input type="checkbox" defaultChecked /> Disponible ahora</label></div></aside><div><div className="active-filters">{city !== "Todas" && <button onClick={() => setCity("Todas")}>{city} ×</button>}{operation !== "Todas" && <button onClick={() => setOperation("Todas")}>{operation} ×</button>}{style !== "Todos" && <button onClick={() => setStyle("Todos")}>{style} ×</button>}</div>{filtered.length ? <div className="product-grid catalog-grid">{filtered.map((product) => <ProductCard key={product.id} product={product} openProduct={openProduct} favorite={favorites.includes(product.id)} toggleFavorite={toggleFavorite} />)}</div> : <div className="empty-state"><span>◇</span><h3>No encontramos prendas con esos filtros</h3><p>Prueba con otra ciudad u operación.</p></div>}<div className="pagination"><button>←</button><button className="active">1</button><button>2</button><button>3</button><button>→</button></div></div></div></div>;
+  return (
+    <div className="catalog-page section-pad">
+      <div className="catalog-head">
+        <span className="eyebrow">CATÁLOGO ROPALIA</span>
+        <h1>{operation === "Alquiler" ? <>Prendas para <i>alquilar</i></> : operation === "Venta" ? <>Prendas para <i>comprar</i></> : <>Encuentra algo <i>muy tú</i></>}</h1>
+        <p>{filtered.length} prendas disponibles {operation === "Alquiler" ? "en alquiler" : operation === "Venta" ? "para comprar" : "para comprar o alquilar"} en Bolivia.</p>
+      </div>
+      <div className="catalog-toolbar">
+        <button className="filter-toggle" onClick={() => setFiltersOpen(true)} aria-expanded={filtersOpen} aria-controls="catalog-filters">☷ Filtros</button>
+        <span>{filtered.length} resultados</span>
+        <label>Ordenar por <select value={sort} onChange={(e) => setSort(e.target.value)}><option>Recomendados</option><option>Menor precio</option><option>Mayor precio</option></select></label>
+      </div>
+      <div className="catalog-layout">
+        {filtersOpen && <button className="filter-backdrop" aria-label="Cerrar filtros" onClick={() => setFiltersOpen(false)} />}
+        <aside id="catalog-filters" className={`filters ${filtersOpen ? "open" : ""}`} aria-label="Filtros del catálogo">
+          <div className="filter-title"><b>Filtros</b><div><button onClick={clearFilters}>Limpiar</button><button className="filter-close" onClick={() => setFiltersOpen(false)} aria-label="Cerrar filtros">×</button></div></div>
+          <FilterSelect label="Ciudad" value={city} setValue={setCity} options={["Todas", ...cities]} />
+          <FilterSelect label="Operación" value={operation} setValue={setOperation} options={["Todas", "Venta", "Alquiler"]} />
+          <FilterSelect label="Estilo" value={style} setValue={setStyle} options={["Todos", "Casual", "Formal"]} />
+          <div className="filter-block"><b>Rango de precio</b><div className="price-inputs"><input inputMode="numeric" placeholder="Bs 0" aria-label="Precio mínimo" /><span>—</span><input inputMode="numeric" placeholder="Bs 800" aria-label="Precio máximo" /></div></div>
+          <div className="filter-block"><b>Talla</b><div className="size-buttons">{["XS", "S", "M", "L", "XL"].map((s) => <button key={s}>{s}</button>)}</div></div>
+          <div className="filter-block"><b>Disponibilidad</b><label className="check"><input type="checkbox" defaultChecked /> Disponible ahora</label></div>
+          <button className="btn dark filter-apply" onClick={() => setFiltersOpen(false)}>Ver {filtered.length} resultados</button>
+        </aside>
+        <div>
+          <div className="active-filters">{city !== "Todas" && <button onClick={() => setCity("Todas")}>{city} ×</button>}{operation !== "Todas" && <button onClick={() => setOperation("Todas")}>{operation} ×</button>}{style !== "Todos" && <button onClick={() => setStyle("Todos")}>{style} ×</button>}</div>
+          {filtered.length ? <div className="product-grid catalog-grid">{filtered.map((product) => <ProductCard key={product.id} product={product} openProduct={openProduct} favorite={favorites.includes(product.id)} toggleFavorite={toggleFavorite} />)}</div> : <div className="empty-state"><span>◇</span><h3>No encontramos prendas con esos filtros</h3><p>Prueba con otra ciudad u operación.</p></div>}
+          <div className="pagination"><button>←</button><button className="active">1</button><button>2</button><button>3</button><button>→</button></div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function FilterSelect({ label, value, setValue, options }: { label: string; value: string; setValue: (value: string) => void; options: string[] }) { return <div className="filter-block"><b>{label}</b><select value={value} onChange={(e) => setValue(e.target.value)}>{options.map((option) => <option key={option}>{option}</option>)}</select></div>; }
